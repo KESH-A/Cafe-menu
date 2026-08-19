@@ -57,42 +57,23 @@ function App() {
 
 useEffect(() => {
   const handleResize = () => {
-    const width = window.visualViewport 
-      ? window.visualViewport.width 
-      : document.documentElement.clientWidth || window.innerWidth;
-
-    setWindowWidth(width);
+    setWindowWidth(window.innerWidth);
   };
-
   handleResize();
-
-
   window.addEventListener("resize", handleResize);
-  window.addEventListener("orientationchange", handleResize);
-
-  if (window.visualViewport) {
-    window.visualViewport.addEventListener("resize", handleResize);
-  }
-
-  return () => {
-    window.removeEventListener("resize", handleResize);
-    window.removeEventListener("orientationchange", handleResize);
-    if (window.visualViewport) {
-      window.visualViewport.removeEventListener("resize", handleResize);
-    }
-  };
+  return () => window.removeEventListener("resize", handleResize);
 }, []);
 
 
 if (windowWidth < 600) {
-  var btnWidth = 45;
+  var btnWidth = 60;
   var barHeight = 70;
   var barWidth = btnWidth * tabs.length;
-  var bubbleSize = 45;
-  var cornerRadius = 30;
+  var bubbleSize = 50;
+  var cornerRadius = 40;
   var edgeMargin = cornerRadius;
-  var baseNotchRadius = 25;
-  var notchSpread = 5;
+  var baseNotchRadius = 35;
+  var notchSpread = 8;
 } else {
   var btnWidth = 80;
   var barHeight = 70;
@@ -242,7 +223,10 @@ const filteredProducts = PRODUCTS.filter((item) => {
             )}
         </main>
 
-        <div className={`fixed bottom-6 left-4 sm:left-6 z-40 transition-all duration-300 ease-in-out ${(isCartOpen || isInfoOpen) ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"}`}>
+        <div 
+          className={`fixed left-4 sm:left-6 z-40 transition-all duration-300 ease-in-out ${(isCartOpen || isInfoOpen) ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"}`}
+          style={{ bottom: `${barHeight + 24 + 5}px` }}
+        >
             <button
               onClick={() => isInfoOpen ? closeInfo() : setIsInfoOpen(true)}
               className="w-12 h-12 sm:w-14 sm:h-14 bg-slate-900/90 border border-white/20 text-slate-200 rounded-full flex items-center justify-center shadow-xl backdrop-blur-md hover:bg-slate-800 hover:scale-105 transition-all duration-300 ease-in-out active:scale-90 cursor-pointer"  
@@ -251,7 +235,10 @@ const filteredProducts = PRODUCTS.filter((item) => {
             </button>
         </div>
 
-        <div className={`fixed bottom-6 right-4 sm:right-6 z-40 transition-all duration-300 ease-in-out ${(isCartOpen || isInfoOpen) ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"}`}>
+        <div 
+          className={`fixed right-4 sm:right-6 z-40 transition-all duration-300 ease-in-out ${(isCartOpen || isInfoOpen) ? "opacity-0 scale-90 pointer-events-none" : "opacity-100 scale-100"}`}
+          style={{ bottom: `${barHeight + 24 + 5}px` }}
+        >
           <button
             onClick={() => isCartOpen ? closeCart() : setIsCartOpen(true)}
             className="w-12 h-12 sm:w-14 sm:h-14 bg-amber-500 hover:bg-amber-400 text-slate-950 rounded-full flex items-center justify-center shadow-xl shadow-amber-500/20 font-bold transition-all duration-300 ease-in-out active:scale-90 hover:scale-105 relative cursor-pointer"
@@ -275,14 +262,20 @@ const filteredProducts = PRODUCTS.filter((item) => {
             {id:"favorites",icon: Heart, label: "Favorites"},
           ];
           const activeIndex = tabs.findIndex((t) => t.id === activeTab);
+          const isEdgeTab = activeIndex === 0 || activeIndex === tabs.length - 1;
+          const effectiveNotchSpread = isEdgeTab ? 0 : notchSpread;
 
           const notchCenterX = btnWidth * activeIndex + btnWidth / 2;
           const roomLeft = notchCenterX - edgeMargin;
           const roomRight = (barWidth - edgeMargin) - notchCenterX;
           const notchRadius = Math.max(Math.min(roomLeft, roomRight, baseNotchRadius), 18);
-          const dipDepth = notchRadius * 0.72;
-          const notchLeftOuter = notchCenterX - notchRadius - notchSpread;
-          const notchRightOuter = notchCenterX + notchRadius + notchSpread;
+          const dipDepth = isEdgeTab ? 0 : notchRadius * 0.72;
+          const notchLeftOuter = notchCenterX - notchRadius - effectiveNotchSpread;
+          const notchRightOuter = notchCenterX + notchRadius + effectiveNotchSpread;
+
+          const bubbleTop = isEdgeTab
+            ? barHeight - bubbleSize - 10
+            : -(bubbleSize - dipDepth) + 6;
 
           const notchPath = `
             M0,${cornerRadius}
@@ -319,12 +312,12 @@ const filteredProducts = PRODUCTS.filter((item) => {
               <div
                 className="absolute rounded-full bg-amber-500 shadow-lg shadow-amber-500/40 pointer-events-none flex items-center justify-center"
                 style={{
-                  width: `${bubbleSize}px`,
-                  height: `${bubbleSize}px`,
-                  top: `${-(bubbleSize - dipDepth) + 6}px`,
-                  left: `${btnWidth / 2 - bubbleSize / 2}px`,
-                  transform: `translateX(${activeIndex * btnWidth}px)`,
-                  transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                width: `${bubbleSize}px`,
+                height: `${bubbleSize}px`,
+                top: `${bubbleTop}px`,
+                left: `${btnWidth / 2 - bubbleSize / 2}px`,
+                transform: `translateX(${activeIndex * btnWidth}px)`,
+                transition: 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), top 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)',
                 }}
               >
                 {(() => {
