@@ -85,14 +85,14 @@ useEffect(() => {
 
 
 if (windowWidth < 600) {
-  var btnWidth = 60;
+  var btnWidth = 45;
   var barHeight = 70;
   var barWidth = btnWidth * tabs.length;
-  var bubbleSize = 50;
-  var cornerRadius = 40;
+  var bubbleSize = 45;
+  var cornerRadius = 30;
   var edgeMargin = cornerRadius;
-  var baseNotchRadius = 35;
-  var notchSpread = 12;
+  var baseNotchRadius = 25;
+  var notchSpread = 5;
 } else {
   var btnWidth = 80;
   var barHeight = 70;
