@@ -10,7 +10,7 @@ import {
   Coffee,
   IceCream,
   Menu,
-  Sandwich,
+  Utensils,
   Heart,
   ShoppingBag,
   Info,
@@ -35,7 +35,7 @@ const tabs = [
    {id:"all",icon: Menu, label: "All"},
    {id:"coffee",icon: Coffee, label: "Coffee"},
    {id:"desserts",icon: IceCream, label: "Dessert"},
-   {id:"food",icon: Sandwich, label: "Food"},
+   {id:"food",icon: Utensils, label: "Food"},
    {id:"favorites",icon: Heart, label: "Favorites"},
 ];
 
@@ -57,11 +57,30 @@ function App() {
 
 useEffect(() => {
   const handleResize = () => {
-    setWindowWidth(window.innerWidth);
+    const width = window.visualViewport 
+      ? window.visualViewport.width 
+      : document.documentElement.clientWidth || window.innerWidth;
+
+    setWindowWidth(width);
   };
+
   handleResize();
+
+
   window.addEventListener("resize", handleResize);
-  return () => window.removeEventListener("resize", handleResize);
+  window.addEventListener("orientationchange", handleResize);
+
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener("resize", handleResize);
+  }
+
+  return () => {
+    window.removeEventListener("resize", handleResize);
+    window.removeEventListener("orientationchange", handleResize);
+    if (window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", handleResize);
+    }
+  };
 }, []);
 
 
@@ -252,7 +271,7 @@ const filteredProducts = PRODUCTS.filter((item) => {
             {id:"all",icon: Menu, label: "All"},
             {id:"coffee",icon: Coffee, label: "Coffee"},
             {id:"desserts",icon: IceCream, label: "Dessert"},
-            {id:"food",icon: Sandwich, label: "Food"},
+            {id:"food",icon: Utensils, label: "Food"},
             {id:"favorites",icon: Heart, label: "Favorites"},
           ];
           const activeIndex = tabs.findIndex((t) => t.id === activeTab);
